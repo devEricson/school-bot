@@ -49,9 +49,19 @@ def get_holiday_info():
     return None
 
 # --- НАСТРОЙКИ БОТА ---
-TOKEN = '8798484496:AAFXcnWcdKVv3RE31DqN4CKOQUZ47hqhpvs'
-DATA_FILE = 'class_db.json'
-ADMIN_IDS = [1701265587]  
+TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+if not TOKEN:
+    raise SystemExit("Set TELEGRAM_BOT_TOKEN before starting the bot (see README.md).")
+DATA_FILE = os.environ.get("DATA_FILE", "class_db.local.json")
+ADMIN_USERNAMES = {
+    username.strip().lstrip("@").lower()
+    for username in os.environ.get("ADMIN_USERNAMES", "").split(",")
+    if username.strip()
+}
+try:
+    ADMIN_IDS = [int(uid.strip()) for uid in os.environ.get("ADMIN_IDS", "").split(",") if uid.strip()]
+except ValueError:
+    raise SystemExit("ADMIN_IDS must be comma-separated numeric Telegram user IDs.") from None
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -73,25 +83,8 @@ def load_db():
             if 'attendance' not in db: db['attendance'] = {}
             if 'users' not in db: db['users'] = {}
             return db
-    return {
-        "users": {}, "user_map": {}, "attendance": {},
-        "allowed_users": {
-            "damikiri": "Асанова Дамира", "berriikova": "Берикова Аяна",
-            "klawluv": "Жумагазина Анеля", "tolenova_a": "Толенова Тамина",
-            "vnlxbb": "Султан Ботагоз", "Qwanxx": "Бегалиеев Куаныш",
-            "ayttax": "Кайраткызы Акбота", "aikoshyymm": "Асанхан Аяру",
-            "inkxqs": "Абдешова Инабат", "karymsakov17": "Карымсаков Нурдаулет",
-            "r4ven_25": "Дубаев Чингиз", "muratovv4": "Мурат Али",
-            "nurhzx": "Ундаганов Нурали", "zk1eem": "Кылышбай Жаннур",
-            "userk1mi": "Цой Тимур", "ts9qq": "Иманов Диас",
-            "amywthh": "Каир Айнара", "madiinasw": "Кенизбай Мадина",
-            "ka_ayon": "Касым Аянат", "mxsrm5": "Нсангалиева Мариям",
-            "lamivh": "Нуртазин Ерзат", "jdaiaw": "Самат Меирбек",
-            "ser1kovnn": "Бакитова Саида", "zhakonaq": "Алибек Жаннур",
-            "zk_2312": "Амантаева Инжу", "abix_gg": "Турлан Абылай",
-            "shotbikon": "Ерниязов Бекжан", "lokeie": "Кыдыралин Даулет"
-        }
-    }
+    return {"users": {}, "user_map": {}, "attendance": {}, "allowed_users": {}}
+
 
 def save_db(db):
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
@@ -100,7 +93,7 @@ def save_db(db):
 def is_admin(uid):
     db = load_db()
     username = db['user_map'].get(str(uid))
-    return username in {"damikiri", "tolenova_a", "shotbikon"}
+    return username in ADMIN_USERNAMES
 
 # --- МЕНЮ ---
 def get_student_menu():
