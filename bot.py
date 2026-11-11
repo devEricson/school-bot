@@ -38,16 +38,6 @@ def is_weekend_or_holiday():
     
     return False, ""
 
-def get_holiday_info():
-    """Возвращает информацию о сегодняшнем дне"""
-    now = datetime.now(TIMEZONE)
-    today_date = now.date()
-    is_holiday, reason = is_weekend_or_holiday()
-    
-    if is_holiday:
-        return f"🚫 <b>Сегодня {reason}.</b> Отметка недоступна."
-    return None
-
 # --- НАСТРОЙКИ БОТА ---
 TOKEN = '8798484496:AAFXcnWcdKVv3RE31DqN4CKOQUZ47hqhpvs'
 DATA_FILE = 'class_db.json'
