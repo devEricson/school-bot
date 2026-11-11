@@ -231,6 +231,8 @@ def mark_self(message):
 def set_student_status(message):
     uid = str(message.from_user.id)
     db = load_db()
+    if uid not in db['users']:
+        return
     day = get_today()
 
     # НОВОЕ: Проверка выходных и праздников
