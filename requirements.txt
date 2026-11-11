@@ -1,0 +1,4 @@
+pyTelegramBotAPI==4.37.1
+pytz==2026.6
+schedule==1.2.2
+holidays==0.108
